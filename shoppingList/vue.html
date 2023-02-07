@@ -1,0 +1,88 @@
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+</head>
+
+<body>
+    <div id="shopping-list">
+        <div class="header">
+            <h1 class="h1">{{header || 'Easteregg'}}</h1>
+        </div>
+        <button v-if="editing" @click="doEdit(false)" class="btn btn-danger">Cancel</button>
+        <button v-else @click="doEdit(true)" class="btn btn-primary">Add item</button>
+        <p v-if="items.length === 0 && !editing">Nice job! You've bought all your items!</p>
+        <div class="add-item-form" v-if="editing">
+            <input type="text" v-model='newItem' v-on:keyup.enter="saveItem" >
+            <label>
+                <input type="checkbox" name="" id="" v-model="newItemHighPriority" class="form-check-input">
+                High Priority
+            </label>
+            <button 
+            v-on:click="saveItem" 
+            :disabled = "newItem.lenght < 5"
+            class = "btn btn-primary"
+            >
+                Save Item
+            </button>
+        </div>
+        <ul class="list-group">
+            <li 
+            v-for="item in reversedItems" 
+            @click = "togglePucharsed(item)"
+            :key="item.id"
+            :class = "[
+                item.purchased ? 'text-decoration-line-through link-secondary' : '',
+                item.highPriority ? 'link-warning': '',
+                'list-group-item']"
+            >
+                {{item.label}}
+            </li>
+        </ul>
+    </div>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script>
+        let shoppingList = Vue.createApp({
+            data() {
+                return {
+                    header: 'Shopping List App',
+                    items: [
+                        { id: 1, label: 'Party hat', purchased: false, highPriority: true},
+                        { id: 2, label: 'Board games', purchased: true, highPriority: false},
+                        { id: 3, label: 'Cups', purchased: true, highPriority: false}
+                    ],
+                    newItem: '',
+                    newItemHighPriority: false,
+                    editing: false
+                }
+            },
+            computed: {
+                reversedItems (){
+                    return [...this.items].reverse()
+                }
+            },
+            methods: {
+                saveItem() {
+                    this.items.push({ id: this.items.length + 1, label: this.newItem, purchased: false, highPriority: this.newItemHighPriority})
+                    this.newItem = ''
+                    this.newItemHighPriority = ''
+                },
+                doEdit(editing) {
+                    this.editing = editing
+                    this.newItem = ''
+                },
+                togglePucharsed (item){
+                    item.purchased = !item.purchased
+                }
+            }
+        })
+            .mount('#shopping-list')
+    </script>
+</body>
+
+</html>
